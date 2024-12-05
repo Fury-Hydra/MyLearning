@@ -1,0 +1,64 @@
+[cloudera@quickstart ~]$ beeline
+Beeline version 1.1.0-cdh5.13.0 by Apache Hive
+beeline> 
+beeline> !connect jdbc:hive2://quickstart.cloudera:10000/bigdata
+scan complete in 2ms
+Connecting to jdbc:hive2://quickstart.cloudera:10000/bigdata
+Enter username for jdbc:hive2://quickstart.cloudera:10000/bigdata: 
+Enter password for jdbc:hive2://quickstart.cloudera:10000/bigdata: 
+Connected to: Apache Hive (version 1.1.0-cdh5.13.0)
+Driver: Hive JDBC (version 1.1.0-cdh5.13.0)
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+0: jdbc:hive2://quickstart.cloudera:10000/big> show databases;
+INFO  : Compiling command(queryId=hive_20241110214444_5cc8f12d-cb19-4dc8-9edb-b310235b49e9): show databases
+INFO  : Semantic Analysis Completed
+INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:database_name, type:string, comment:from deserializer)], properties:null)
+INFO  : Completed compiling command(queryId=hive_20241110214444_5cc8f12d-cb19-4dc8-9edb-b310235b49e9); Time taken: 0.757 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hive_20241110214444_5cc8f12d-cb19-4dc8-9edb-b310235b49e9): show databases
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hive_20241110214444_5cc8f12d-cb19-4dc8-9edb-b310235b49e9); Time taken: 0.06 seconds
+INFO  : OK
++----------------+--+
+| database_name  |
++----------------+--+
+| bigdata        |
+| default        |
++----------------+--+
+2 rows selected (1.387 seconds)
+0: jdbc:hive2://quickstart.cloudera:10000/big> show tables;
+INFO  : Compiling command(queryId=hive_20241110214444_6996d3e3-5b5f-4520-b97a-d3b3ec601f1a): show tables
+INFO  : Semantic Analysis Completed
+INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:tab_name, type:string, comment:from deserializer)], properties:null)
+INFO  : Completed compiling command(queryId=hive_20241110214444_6996d3e3-5b5f-4520-b97a-d3b3ec601f1a); Time taken: 0.008 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hive_20241110214444_6996d3e3-5b5f-4520-b97a-d3b3ec601f1a): show tables
+INFO  : Starting task [Stage-0:DDL] in serial mode
+INFO  : Completed executing command(queryId=hive_20241110214444_6996d3e3-5b5f-4520-b97a-d3b3ec601f1a); Time taken: 0.079 seconds
+INFO  : OK
++------------+--+
+|  tab_name  |
++------------+--+
+| employee   |
+| employee1  |
++------------+--+
+2 rows selected (0.108 seconds)
+0: jdbc:hive2://quickstart.cloudera:10000/big> select * from employee;
+INFO  : Compiling command(queryId=hive_20241110214444_b294aebd-f06a-4970-b722-a29a3e82cd5e): select * from employee
+INFO  : Semantic Analysis Completed
+INFO  : Returning Hive schema: Schema(fieldSchemas:[FieldSchema(name:employee.empid, type:int, comment:null), FieldSchema(name:employee.empname, type:string, comment:null), FieldSchema(name:employee.address, type:string, comment:null)], properties:null)
+INFO  : Completed compiling command(queryId=hive_20241110214444_b294aebd-f06a-4970-b722-a29a3e82cd5e); Time taken: 0.363 seconds
+INFO  : Concurrency mode is disabled, not creating a lock manager
+INFO  : Executing command(queryId=hive_20241110214444_b294aebd-f06a-4970-b722-a29a3e82cd5e): select * from employee
+INFO  : Completed executing command(queryId=hive_20241110214444_b294aebd-f06a-4970-b722-a29a3e82cd5e); Time taken: 0.0 seconds
+INFO  : OK
++-----------------+-------------------+-------------------+--+
+| employee.empid  | employee.empname  | employee.address  |
++-----------------+-------------------+-------------------+--+
+| 101             | Karthik           | india             |
+| 102             | ravi              | USA               |
+| 103             | fury              | UK                |
+| 104             | tom               | usa               |
++-----------------+-------------------+-------------------+--+
+4 rows selected (0.565 seconds)
+0: jdbc:hive2://quickstart.cloudera:10000/big> 
