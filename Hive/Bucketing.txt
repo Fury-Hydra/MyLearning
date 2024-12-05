@@ -1,0 +1,86 @@
+Non-Bucketed Table
+====================
+    >     id INT,
+    >     name STRING,
+    >     cost DOUBLE,
+    >     category STRING
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ',';
+OK
+Time taken: 0.414 seconds
+==============================
+Load Data
+=========
+hive> LOAD DATA LOCAL INPATH '/home/cloudera/datasets/newproducts.csv' INTO TABLE products_no_buckets;
+Loading data to table default.products_no_buckets
+Table default.products_no_buckets stats: [numFiles=1, totalSize=213]
+OK
+Time taken: 0.786 seconds
+
+===============================================
+Bucketed Table
+================
+hive> SET hive.enforce.bucketing=true;
+
+hive> CREATE TABLE products_w_buckets (
+    >     id INT,
+    >     name STRING,
+    >     cost DOUBLE,
+    >     category STRING
+    > )
+    > CLUSTERED BY (id) INTO 4 BUCKETS;
+OK
+Time taken: 0.393 seconds
+=========================================
+Insert Data into Bucketed Table:
+==================================
+hive> FROM products_no_buckets
+    > INSERT INTO TABLE products_w_buckets
+    > SELECT id, name, cost, category;
+Query ID = cloudera_20241117081717_eac0742f-4bd1-404d-bb5f-8db0483b09d6
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 4
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1731839017652_0005, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0005/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0005
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 4
+2024-11-17 08:18:26,865 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 08:19:06,867 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.38 sec
+2024-11-17 08:20:09,660 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.38 sec
+2024-11-17 08:21:10,573 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 4.38 sec
+2024-11-17 08:21:31,274 Stage-1 map = 100%,  reduce = 17%, Cumulative CPU 5.83 sec
+2024-11-17 08:21:34,373 Stage-1 map = 100%,  reduce = 33%, Cumulative CPU 7.43 sec
+2024-11-17 08:21:36,753 Stage-1 map = 100%,  reduce = 50%, Cumulative CPU 9.03 sec
+2024-11-17 08:21:39,137 Stage-1 map = 100%,  reduce = 67%, Cumulative CPU 10.8 sec
+2024-11-17 08:22:07,690 Stage-1 map = 100%,  reduce = 83%, Cumulative CPU 18.88 sec
+2024-11-17 08:22:13,587 Stage-1 map = 100%,  reduce = 92%, Cumulative CPU 28.69 sec
+2024-11-17 08:22:15,680 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 32.58 sec
+MapReduce Total cumulative CPU time: 34 seconds 20 msec
+Ended Job = job_1731839017652_0005
+Loading data to table default.products_w_buckets
+Table default.products_w_buckets stats: [numFiles=4, numRows=10, totalSize=225, rawDataSize=215]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1  Reduce: 4   Cumulative CPU: 34.02 sec   HDFS Read: 19560 HDFS Write: 553 SUCCESS
+Total MapReduce CPU Time Spent: 34 seconds 20 msec
+OK
+Time taken: 286.035 seconds
+
+=================================================================================================================
+hive> SELECT * FROM products_w_buckets TABLESAMPLE (BUCKET 1 OUT OF 4);
+OK
+8       earings 69.0    fashion
+Time taken: 0.442 seconds, Fetched: 1 row(s)
+hive> SELECT * FROM products_w_buckets TABLESAMPLE (BUCKET 2 OUT OF 4);
+OK
+9       chair   129.0   furniture
+5       Nokia Y 39.99   mobile
+1       iPhone  379.99  mobiles
+Time taken: 0.416 seconds, Fetched: 3 row(s)
+====================================================================================

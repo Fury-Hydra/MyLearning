@@ -1,0 +1,111 @@
+Dynamic Partitioning-
+
+Enable Dynamic Partitioning:
+==============================
+
+hive>
+    > SET hive.exec.dynamic.partition=true;
+hive> SET hive.exec.dynamic.partition.mode=nonstrict;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Table Without Partitioning
+===========================
+hive> CREATE TABLE orders_no_partition1 (
+    >     id STRING,
+    >     customer_id STRING,
+    >     product_id STRING,
+    >     quantity INT,
+    >     amount DOUBLE,
+    >     zipcode CHAR(5),
+    >     state CHAR(2)
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ',';
+OK
+Time taken: 0.981 seconds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Load Data
+===========
+hive> load data local inpath
+    > '/home/cloudera/datasets/orders_CA_with_state.csv'
+    > into table orders_no_partition1;
+Loading data to table default.orders_no_partition1
+Table default.orders_no_partition1 stats: [numFiles=3, totalSize=360]
+OK
+Time taken: 1.747 seconds
+=====
+hive> load data local inpath
+    > '/home/cloudera/datasets/orders_NY_with_state.csv'
+    > into table orders_no_partition1;
+Loading data to table default.orders_no_partition1
+Table default.orders_no_partition1 stats: [numFiles=4, totalSize=512]
+OK
+Time taken: 2.267 seconds
+=========
+hive> load data local inpath
+    > '/home/cloudera/datasets/orders_CT_with_state.csv'
+    > into table orders_no_partition1;
+Loading data to table default.orders_no_partition1
+Table default.orders_no_partition1 stats: [numFiles=5, totalSize=656]
+OK
+Time taken: 1.523 seconds
+hive>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Dynamic Table
+==============
+hive> CREATE TABLE orders (
+    >     id STRING,
+    >     customer_id STRING,
+    >     product_id STRING,
+    >     quantity INT,
+    >     amount DOUBLE,
+    >     zipcode CHAR(5)
+    > )
+    > PARTITIONED BY (state CHAR(2))
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ',';
+OK
+Time taken: 0.534 seconds
+===========================
+Insert into Dynamic Partitioned Table:
+=======================================
+
+hive> INSERT INTO TABLE orders
+    > PARTITION (state)
+    > SELECT * FROM orders_no_partition1;
+Query ID = cloudera_20241117081010_fee3cadc-5378-4a84-a9f3-ce468416e665
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1731839017652_0004, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0004/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0004
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-11-17 08:12:09,494 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 08:13:03,555 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.38 sec
+MapReduce Total cumulative CPU time: 7 seconds 380 msec
+Ended Job = job_1731839017652_0004
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/orders/.hive-staging_hive_2024-11-17_08-10-59_899_7838555397545060709-1/-ext-10000
+Loading data to table default.orders partition (state=null)
+         Time taken for load dynamic partitions : 1976
+        Loading partition {state=CA}
+        Loading partition {state=NY}
+        Loading partition {state=CT}
+         Time taken for adding to write entity : 37
+Partition default.orders{state=CA} stats: [numFiles=1, numRows=12, totalSize=300, rawDataSize=288]
+Partition default.orders{state=CT} stats: [numFiles=1, numRows=4, totalSize=116, rawDataSize=112]
+Partition default.orders{state=NY} stats: [numFiles=1, numRows=4, totalSize=124, rawDataSize=120]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 7.38 sec   HDFS Read: 6163 HDFS Write: 706 SUCCESS
+Total MapReduce CPU Time Spent: 7 seconds 380 msec
+OK
+Time taken: 131.661 seconds
+=================================================================================================
+hive> SHOW PARTITIONS orders;
+OK
+state=CA
+state=CT
+state=NY
+Time taken: 0.455 seconds, Fetched: 3 row(s)
+===============================================

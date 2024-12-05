@@ -1,0 +1,34 @@
+Partitioning
+===============
+a) Static Partitioning
+=======================
+hive> CREATE TABLE orders_w_partition1 (
+    >     id STRING,
+    >     customer_id STRING,
+    >     product_id STRING,
+    >     quantity INT,
+    >     amount DOUBLE,
+    >     zipcode CHAR(5)
+    > )
+    > PARTITIONED BY (state CHAR(2), country STRING)
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ',';
+OK
+Time taken: 3.536 seconds
+
+Load Data-
+~~~~~~~~~~
+hive> LOAD DATA LOCAL INPATH '/home/cloudera/datasets/orders_CT_with_state.csv' INTO TABLE orders_w_partition1 PARTITION (state="CT", country="USA");
+Loading data to table default.orders_w_partition1 partition (state=CT, country=USA)
+Partition default.orders_w_partition1{state=CT, country=USA} stats: [numFiles=1, numRows=0, totalSize=144, rawDataSize=0]
+OK
+Time taken: 6.03 seconds
+
+Query DATA
+===========
+hive> SELECT id, state, customer_id, product_id
+    > FROM orders_w_partition1
+    > WHERE state = 'CA';
+OK
+Time taken: 14.404 seconds
+
