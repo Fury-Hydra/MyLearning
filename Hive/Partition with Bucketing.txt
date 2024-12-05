@@ -1,0 +1,93 @@
+ Partition with Bucketing:-
+ ===========================
+ hive> CREATE TABLE products_partitioned_buckets (
+    >     id INT,
+    >     name STRING,
+    >     cost DOUBLE
+    > )
+    > PARTITIONED BY (category STRING)
+    > CLUSTERED BY (id) INTO 4 BUCKETS
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY ',';
+OK
+Time taken: 0.535 seconds
+===================================================
+Enable Partitioning and Bucketing:
+====================================
+hive> SET hive.exec.dynamic.partition=true;
+hive> SET hive.exec.dynamic.partition.mode=nonstrict;
+hive> SET hive.enforce.bucketing=true;
+
+=====================================================
+Insert Data into Partitioned Bucketed Table:
+==============================================
+hive> INSERT INTO TABLE products_partitioned_buckets
+    > PARTITION (category)
+    > SELECT id, name, cost, category
+    > FROM products_no_buckets;
+Query ID = cloudera_20241117082626_287f83d0-cebe-43f4-b4cd-ef3bbcbdf167
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks determined at compile time: 4
+In order to change the average load for a reducer (in bytes):
+  set hive.exec.reducers.bytes.per.reducer=<number>
+In order to limit the maximum number of reducers:
+  set hive.exec.reducers.max=<number>
+In order to set a constant number of reducers:
+  set mapreduce.job.reduces=<number>
+Starting Job = job_1731839017652_0006, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0006/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0006
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 4
+2024-11-17 08:27:34,170 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 08:28:23,075 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.44 sec
+2024-11-17 08:29:23,688 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.44 sec
+2024-11-17 08:30:24,877 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 7.44 sec
+2024-11-17 08:30:29,603 Stage-1 map = 100%,  reduce = 50%, Cumulative CPU 13.35 sec
+2024-11-17 08:30:41,745 Stage-1 map = 100%,  reduce = 67%, Cumulative CPU 19.45 sec
+2024-11-17 08:30:59,036 Stage-1 map = 100%,  reduce = 75%, Cumulative CPU 23.36 sec
+2024-11-17 08:31:03,531 Stage-1 map = 100%,  reduce = 83%, Cumulative CPU 27.34 sec
+2024-11-17 08:31:05,683 Stage-1 map = 100%,  reduce = 92%, Cumulative CPU 27.34 sec
+2024-11-17 08:31:12,675 Stage-1 map = 100%,  reduce = 100%, Cumulative CPU 38.37 sec
+MapReduce Total cumulative CPU time: 38 seconds 370 msec
+Ended Job = job_1731839017652_0006
+Loading data to table default.products_partitioned_buckets partition (category=null)
+         Time taken for load dynamic partitions : 3857
+        Loading partition {category=toys}
+        Loading partition {category=fashion}
+        Loading partition {category=furniture}
+        Loading partition {category=mobiles}
+        Loading partition {category=mobile}
+         Time taken for adding to write entity : 2
+Partition default.products_partitioned_buckets{category=fashion} stats: [numFiles=4, numRows=2, totalSize=30, rawDataSize=28]
+Partition default.products_partitioned_buckets{category=furniture} stats: [numFiles=4, numRows=2, totalSize=29, rawDataSize=27]
+Partition default.products_partitioned_buckets{category=mobile} stats: [numFiles=4, numRows=2, totalSize=33, rawDataSize=31]
+Partition default.products_partitioned_buckets{category=mobiles} stats: [numFiles=4, numRows=1, totalSize=16, rawDataSize=15]
+Partition default.products_partitioned_buckets{category=toys} stats: [numFiles=4, numRows=3, totalSize=44, rawDataSize=41]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1  Reduce: 4   Cumulative CPU: 38.37 sec   HDFS Read: 20547 HDFS Write: 944 SUCCESS
+Total MapReduce CPU Time Spent: 38 seconds 370 msec
+OK
+Time taken: 282.485 seconds
+=================================================================================================================================
+hive> SHOW PARTITIONS products_partitioned_buckets;
+OK
+category=fashion
+category=furniture
+category=mobile
+category=mobiles
+category=toys
+Time taken: 0.159 seconds, Fetched: 5 row(s)
+hive>
+    > SELECT * FROM products_partitioned_buckets TABLESAMPLE (BUCKET 1 OUT OF 4);
+OK
+8       earings 69.0    fashion
+Time taken: 0.217 seconds, Fetched: 1 row(s)
+hive> SELECT * FROM products_partitioned_buckets TABLESAMPLE (BUCKET 2 OUT OF 4) WHERE name = 'Nokia';
+OK
+Time taken: 0.184 seconds
+hive>
+    > SELECT * FROM products_partitioned_buckets
+    > WHERE name = 'Nokia' AND category = 'fashion';
+OK
+Time taken: 0.241 seconds
+============================================================================================================

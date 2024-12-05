@@ -1,0 +1,126 @@
+1. Create Table
+
+CREATE TABLE grocery_transactions (
+    >     items ARRAY<STRING>
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERM
+
+2.Load data
+
+hive> LOAD DATA LOCAL INPATH '/home/cloudera/datasets/GroceryStoreDataSet.csv'
+    > INTO TABLE grocery_transactions;
+Loading data to table bigdata.grocery_transactions
+Table bigdata.grocery_transactions stats: [numFiles=1, totalSize=478]
+OK
+Time taken: 9.791 seconds
+
+3.View the table 
+
+hive> SELECT * FROM grocery_transactions;
+OK
+["\"MILK"]
+["\"BREAD"]
+["\"BREAD"]
+["\"JAM"]
+["\"MAGGI"]
+["\"BREAD"]
+["\"MAGGI"]
+["\"MAGGI"]
+["\"JAM"]
+["\"BREAD"]
+["\"COFFEE"]
+["\"COFFEE"]
+["\"COFFEE"]
+["\"BREAD"]
+["\"BREAD"]
+["\"COFFEE"]
+["\"BREAD"]
+["\"BREAD"]
+["\"BREAD"]
+["\"TEA"]
+Time taken: 3.505 seconds, Fetched: 20 row(s)
+
+4.Explode 
+To list all transactions:
+
+hive> SELECT EXPLODE(items) AS item FROM grocery_transactions;
+OK
+"MILK
+"BREAD
+"BREAD
+"JAM
+"MAGGI
+"BREAD
+"MAGGI
+"MAGGI
+"JAM
+"BREAD
+"COFFEE
+"COFFEE
+"COFFEE
+"BREAD
+"BREAD
+"COFFEE
+"BREAD
+"BREAD
+"BREAD
+"TEA
+Time taken: 0.975 seconds, Fetched: 20 row(s)
+
+To display all transactions along with exploded items:
+
+hive> SELECT items, item
+    > FROM grocery_transactions
+    > LATERAL VIEW EXPLODE(items) exploded_table AS item;
+OK
+["\"MILK"]      "MILK
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"JAM"]       "JAM
+["\"MAGGI"]     "MAGGI
+["\"BREAD"]     "BREAD
+["\"MAGGI"]     "MAGGI
+["\"MAGGI"]     "MAGGI
+["\"JAM"]       "JAM
+["\"BREAD"]     "BREAD
+["\"COFFEE"]    "COFFEE
+["\"COFFEE"]    "COFFEE
+["\"COFFEE"]    "COFFEE
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"COFFEE"]    "COFFEE
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"TEA"]       "TEA
+Time taken: 0.637 seconds, Fetched: 20 row(s)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lateral View:
+
+SELECT items, b_item
+    > FROM grocery_transactions
+    > LATERAL VIEW EXPLODE(items) item_table AS b_item;
+OK
+["\"MILK"]      "MILK
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"JAM"]       "JAM
+["\"MAGGI"]     "MAGGI
+["\"BREAD"]     "BREAD
+["\"MAGGI"]     "MAGGI
+["\"MAGGI"]     "MAGGI
+["\"JAM"]       "JAM
+["\"BREAD"]     "BREAD
+["\"COFFEE"]    "COFFEE
+["\"COFFEE"]    "COFFEE
+["\"COFFEE"]    "COFFEE
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"COFFEE"]    "COFFEE
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"BREAD"]     "BREAD
+["\"TEA"]       "TEA
+Time taken: 3.571 seconds, Fetched: 20 row(s)
+

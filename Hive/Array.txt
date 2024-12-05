@@ -1,0 +1,55 @@
+hive>
+    > CREATE TABLE laptop_models (
+    >     model_id STRING,
+    >     brand STRING,
+    >     model_name STRING,
+    >     price FLOAT,
+    >     specs ARRAY<STRING>
+    > );
+OK
+Time taken: 1.312 seconds
+hive>
+    > INSERT INTO TABLE laptop_models
+    > SELECT "101", "Dell", "Inspiron 15", 650, ARRAY("Intel i5", "8GB", "512GB SSD")
+    > UNION ALL
+    > SELECT "102", "HP", "Pavilion 14", 750, ARRAY("Intel i7", "16GB", "1TB HDD");
+Query ID = cloudera_20241117060303_f72e2f26-a5c6-4d89-902d-8e3be3f26fff
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1731839017652_0001, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0001/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0001
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-11-17 06:05:08,336 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 06:05:56,445 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 6.72 sec
+MapReduce Total cumulative CPU time: 6 seconds 720 msec
+Ended Job = job_1731839017652_0001
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/bigdata.db/laptop_models/.hive-staging_hive_2024-11-17_06-03-08_232_7072487636916076978-1/-ext-10000
+Loading data to table bigdata.laptop_models
+Table bigdata.laptop_models stats: [numFiles=1, numRows=2, totalSize=97, rawDataSize=95]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 6.72 sec   HDFS Read: 6071 HDFS Write: 174 SUCCESS
+Total MapReduce CPU Time Spent: 6 seconds 720 msec
+OK
+Time taken: 171.945 seconds
+hive>
+    > SELECT * FROM laptop_models;
+OK
+101     Dell    Inspiron 15     650.0   ["Intel i5","8GB","512GB SSD"]
+102     HP      Pavilion 14     750.0   ["Intel i7","16GB","1TB HDD"]
+Time taken: 0.216 seconds, Fetched: 2 row(s)
+hive>
+    > SELECT model_id, specs FROM laptop_models;
+OK
+101     ["Intel i5","8GB","512GB SSD"]
+102     ["Intel i7","16GB","1TB HDD"]
+Time taken: 0.355 seconds, Fetched: 2 row(s)
+hive>
+    > SELECT model_id, specs[0] FROM laptop_models;
+OK
+101     Intel i5
+102     Intel i7
+Time taken: 0.206 seconds, Fetched: 2 row(s)

@@ -1,0 +1,50 @@
+hive> CREATE TABLE laptop_models_with_features (
+    >     model_id STRING,
+    >     brand STRING,
+    >     model_name STRING,
+    >     price FLOAT,
+    >     specs ARRAY<STRING>,
+    >     features MAP<STRING, BOOLEAN>
+    > )
+    > ROW FORMAT DELIMITED
+    > FIELDS TERMINATED BY '#'
+    > MAP KEYS TERMINATED BY ':';
+OK
+Time taken: 0.294 seconds
+hive>
+    > INSERT INTO TABLE laptop_models_with_features
+    > SELECT "101", "Dell", "Inspiron 15", 650, ARRAY("Intel i5", "8GB", "512GB SSD"),
+    >        MAP("backlit_keyboard", true, "touchscreen", false);
+Query ID = cloudera_20241117060707_8ec74ca4-b3ef-4b83-ae73-6cd6e084ec95
+Total jobs = 3
+Launching Job 1 out of 3
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1731839017652_0002, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0002/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0002
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-11-17 06:07:59,027 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 06:08:59,767 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 06:09:06,596 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 8.95 sec
+MapReduce Total cumulative CPU time: 8 seconds 950 msec
+Ended Job = job_1731839017652_0002
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/bigdata.db/laptop_models_with_features/.hive-staging_hive_2024-11-17_06-07-06_078_8492760554935006672-1/-ext-10000
+Loading data to table bigdata.laptop_models_with_features
+Table bigdata.laptop_models_with_features stats: [numFiles=1, numRows=1, totalSize=90, rawDataSize=89]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 8.95 sec   HDFS Read: 5305 HDFS Write: 181 SUCCESS
+Total MapReduce CPU Time Spent: 8 seconds 950 msec
+OK
+Time taken: 125.527 seconds
+hive>
+    > SELECT model_id, features FROM laptop_models_with_features;
+OK
+101     {"backlit_keyboard":true,"touchscreen":false}
+Time taken: 0.473 seconds, Fetched: 1 row(s)
+hive>
+    > SELECT model_id, features['backlit_keyboard'] FROM laptop_models_with_features;
+OK
+101     true
+Time taken: 0.25 seconds, Fetched: 1 row(s)

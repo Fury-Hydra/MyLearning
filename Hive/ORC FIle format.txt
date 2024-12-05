@@ -1,0 +1,40 @@
+ORC FIle format:-
+==================
+hive> create table orders_orc(
+    >     id bigint,
+    >     product_id string,
+    >     customer_id bigint,
+    >     quantity int,
+    >     amount double
+    > ) stored as orc;
+OK
+Time taken: 0.344 seconds
+============================
+Insert data
+=============
+hive> insert into orders_orc
+    > select id, product_id, customer_id, quantity, amount
+    > from orders;
+Query ID = cloudera_20241117090707_41ee010e-b316-4a2e-87d3-780f031b45c6
+Total jobs = 1
+Launching Job 1 out of 1
+Number of reduce tasks is set to 0 since there's no reduce operator
+Starting Job = job_1731839017652_0007, Tracking URL = http://quickstart.cloudera:8088/proxy/application_1731839017652_0007/
+Kill Command = /usr/lib/hadoop/bin/hadoop job  -kill job_1731839017652_0007
+Hadoop job information for Stage-1: number of mappers: 1; number of reducers: 0
+2024-11-17 09:09:15,088 Stage-1 map = 0%,  reduce = 0%
+2024-11-17 09:09:54,858 Stage-1 map = 100%,  reduce = 0%, Cumulative CPU 5.1 sec
+MapReduce Total cumulative CPU time: 5 seconds 100 msec
+Ended Job = job_1731839017652_0007
+Stage-4 is selected by condition resolver.
+Stage-3 is filtered out by condition resolver.
+Stage-5 is filtered out by condition resolver.
+Moving data to: hdfs://quickstart.cloudera:8020/user/hive/warehouse/orders_orc/.hive-staging_hive_2024-11-17_09-07-43_958_437976515767564739-1/-ext-10000
+Loading data to table default.orders_orc
+Table default.orders_orc stats: [numFiles=1, numRows=20, totalSize=604, rawDataSize=1900]
+MapReduce Jobs Launched:
+Stage-Stage-1: Map: 1   Cumulative CPU: 5.1 sec   HDFS Read: 6339 HDFS Write: 680 SUCCESS
+Total MapReduce CPU Time Spent: 5 seconds 100 msec
+OK
+Time taken: 134.276 seconds
+================================================================================================================
