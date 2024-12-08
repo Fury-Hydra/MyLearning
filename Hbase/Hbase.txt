@@ -1,0 +1,46 @@
+Hbase - 
+
+Creating a Table - Creates a table named table with two column families: cf1 and cf2.
+
+create 'table', 'cf1', 'cf2'
+============================================================
+-Purpose: Displays the list of tables in the HBase instance.
+list
+======================================================
+-Inserting Data into the Table - 
+Adds data to the row with row key 123460.
+
+put 'table', '123460', 'cf1:col1', '100'
+put 'table', '123460', 'cf1:col2', 'Karthik'
+put 'table', '123460', 'cf1:col3', 'India'
+
+put 'table', '123460', 'cf2:col1', '101'
+put 'table', '123460', 'cf2:col2', 'Fury'
+put 'table', '123460', 'cf2:col3', 'USA'
+=====================================================
+Scanning Tables
+
+scan 'table'
+=====================
+Fetching Data from the Table - Retrieves data for specific rows or column families
+
+get 'table', '123460'
+get 'table', '123460', 'cf1'
+get 'table', '123460', 'cf2'
+===============================
+Checking Table Status
+
+is_disabled 'table'
+is_enabled 'table'
+====================
+Dropping the Table -A table must be disabled before dropping.
+
+disable 'table'
+drop 'table'
+=================
+
+
+
+
+
+
